@@ -1,13 +1,18 @@
 # PACT project configuration.
 # Every script reads this file, so all paths, sizes and seeds live in one place.
+# Model paths: point these at your local copies (or Hugging Face ids).
 
 seed: 0
 
 paths:
   raw_dir: data/raw              # untouched downloads (cached, never edited)
-  processed_dir: data/processed  # our cleaned datasets, one JSONL file per source
+  processed_dir: data/processed  # prompts: data/processed/<lang>/<source>.jsonl
+  responses_dir: data/responses  # step 3: data/responses/<model>/<lang>/<source>.jsonl
+  labels_dir: data/labels        # step 4: data/labels/<model>/<lang>/<source>.jsonl
+  features_dir: data/features    # step 5: data/features/<model>/<lang>/<source>.npz
+  results_dir: results           # steps 6-8: tables and per-partition rows
 
-# Step 1: the prompt sources we build datasets from.
+# ---------------------------------------------------------------- Step 1
 sources:
   advbench:
     url: https://raw.githubusercontent.com/llm-attacks/llm-attacks/main/data/advbench/harmful_behaviors.csv
@@ -30,3 +35,91 @@ sources:
   benign:
     path: resources/benign_prompts.txt
     expected_count: 60
+
+# ---------------------------------------------------------------- Step 2
+# Language code used in file names -> NLLB language code.
+languages:
+  zh: zho_Hans
+  fr: fra_Latn
+  am: amh_Ethi
+
+translation:
+  model: facebook/nllb-200-distilled-600M
+  source_lang: eng_Latn
+  batch_size: 16
+  max_new_tokens: 100
+  back_translate: [xstest]       # sources that also get <lang>-back (round-trip English)
+
+# ---------------------------------------------------------------- Steps 3-5
+models:
+  base:
+    path: meta-llama/Llama-3.1-8B
+    prompt_style: completion     # no chat template
+  instruct:
+    path: meta-llama/Llama-3.1-8B-Instruct
+    prompt_style: chat           # the tokenizer's chat template
+    # gguf_file: Llama-3.1-8B-Instruct-Q8_0.gguf   # only if `path` is a folder with a GGUF
+
+# Base-model framing. {prompt} is replaced by the prompt text.
+completion_template: "{prompt}\n"
+
+generation:
+  max_new_tokens: 200
+  batch_size: 8
+
+# Which responses to generate: model -> source -> languages.
+generate:
+  base:
+    advbench: [en, zh, fr, am]
+  instruct:
+    xstest: [en, zh-back, fr-back, am-back]
+    orbench_hard: [en]
+    advbench: [en]
+
+# Which prompt features to extract: model -> source -> languages.
+features:
+  base:
+    advbench: [en, zh, fr, am]
+  instruct:
+    xstest: [en, zh, fr, am]
+    orbench_hard: [en, zh, fr, am]
+    advbench: [en]
+    benign: [en]
+
+layers: [8, 12, 16, 20, 24]
+feature_batch_size: 16
+
+labeling:
+  judge_model: instruct          # a key of `models`, used as the LLM judge
+  judge_batch_size: 8
+  partial_refusal_as: refuse     # how XSTest's "partial refusal" collapses to binary
+
+# ---------------------------------------------------------------- Steps 6-8
+conformal:
+  alpha_miss: 0.05
+  alpha_flag: 0.10
+  deltas: [0.05, 0.10, 0.20]     # PAC confidence levels reported (0.05 is the main one)
+
+probe:
+  Cs: [0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1.0, 3.0]
+  cv_folds: 5
+  procrustes_k: 64               # PACT-A2: principal components used for alignment
+
+split:
+  fractions: [0.4, 0.3, 0.3]     # fit / calibration / test
+
+contrast_experiment:             # step 7: instruct model, XSTest + OR-Bench-Hard
+  model: instruct
+  sources: [xstest, orbench_hard]
+  target_langs: [zh, fr, am]
+  n_partitions: 200
+  label_method: judge            # judge | keyword
+  frontier_alphas: [0.05, 0.10, 0.20, 0.30, 0.50]
+
+base_experiment:                 # step 8: base model, AdvBench
+  model: base
+  source: advbench
+  target_langs: [zh, fr, am]
+  n_partitions: 100
+  label_method: keyword
+  label_shift_pis: [0.10, 0.20, 0.40]

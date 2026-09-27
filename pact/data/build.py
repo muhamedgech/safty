@@ -9,6 +9,7 @@ from pathlib import Path
 from pact.data.schema import PromptRecord
 from pact.data.sources import LOADERS
 from pact.io import read_jsonl, sha256_file, write_json, write_jsonl
+from pact.paths import manifest_path, prompts_path
 
 
 def build_source(name: str, config: dict) -> list[PromptRecord]:
@@ -31,23 +32,29 @@ def validate(name: str, records: list[PromptRecord], cfg: dict) -> None:
         raise ValueError(f"{name}: duplicate prompt texts {dupes[:3]}")
 
 
-def save_sources(datasets: dict[str, list[PromptRecord]], config: dict) -> dict:
-    """Write data/processed/en/<source>.jsonl for each source, plus manifest.json."""
-    processed = config["paths"]["processed_dir"]
-    manifest_path = processed / "manifest.json"
-    manifest = load_manifest(manifest_path)
-    for name, records in datasets.items():
-        path = processed / "en" / f"{name}.jsonl"
-        write_jsonl((r.to_dict() for r in records), path)
-        manifest["files"][f"en/{name}.jsonl"] = {
-            "count": len(records),
-            "gold_labels": dict(Counter(r.gold_label for r in records)),
-            "n_translate": sum(r.translate for r in records),
-            "sha256": sha256_file(path),
-        }
+def save_prompts(records: list[PromptRecord], config: dict, lang: str, source: str) -> dict:
+    """Write one prompt file and record its count and sha256 in manifest.json."""
+    path = prompts_path(config, lang, source)
+    write_jsonl((r.to_dict() for r in records), path)
+    entry = {
+        "count": len(records),
+        "gold_labels": dict(Counter(r.gold_label for r in records)),
+        "n_translate": sum(r.translate for r in records),
+        "sha256": sha256_file(path),
+    }
+    manifest = load_manifest(manifest_path(config))
+    manifest["files"][f"{lang}/{source}.jsonl"] = entry
     manifest["seed"] = config["seed"]
     manifest["updated"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    write_json(manifest, manifest_path)
+    write_json(manifest, manifest_path(config))
+    return manifest
+
+
+def save_sources(datasets: dict[str, list[PromptRecord]], config: dict) -> dict:
+    """Step 1: write data/processed/en/<source>.jsonl for each source."""
+    manifest = {}
+    for name, records in datasets.items():
+        manifest = save_prompts(records, config, "en", name)
     return manifest
 
 
@@ -59,6 +66,5 @@ def load_manifest(path: Path) -> dict:
 
 
 def load_source(name: str, config: dict, lang: str = "en") -> list[PromptRecord]:
-    """What later steps call to get a saved dataset back."""
-    path = config["paths"]["processed_dir"] / lang / f"{name}.jsonl"
-    return [PromptRecord.from_dict(d) for d in read_jsonl(path)]
+    """What later steps call to get a saved prompt dataset back."""
+    return [PromptRecord.from_dict(d) for d in read_jsonl(prompts_path(config, lang, name))]

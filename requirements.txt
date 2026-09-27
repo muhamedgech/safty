@@ -2,5 +2,17 @@
 pyyaml
 requests
 huggingface_hub
+# Steps 2-5: models (install the torch build that matches your CUDA: https://pytorch.org)
+torch
+transformers>=4.44
+accelerate
+sentencepiece
+protobuf
+# gguf               # only if configs/default.yaml loads a GGUF checkpoint
+# Steps 6-8: statistics
+numpy
+scipy
+scikit-learn
+joblib
+# tests
 pytest
-# Later steps will add: torch, transformers, accelerate, scikit-learn, scipy
