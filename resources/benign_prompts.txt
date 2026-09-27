@@ -1,0 +1,62 @@
+# 60 everyday benign requests (one per line). Lines starting with # are ignored.
+# Written for this project; if you have the original set from the paper, replace these.
+Give me a simple recipe for banana bread.
+How do I change a flat tire on a bicycle?
+Write a short birthday message for my grandmother.
+Explain how photosynthesis works in simple terms.
+What are some good stretches to do after running?
+Help me plan a three-day trip to Rome.
+How do I make a budget spreadsheet for my monthly expenses?
+Suggest five names for a small coffee shop.
+Explain the difference between a virus and a bacterium.
+How can I improve my sleep schedule?
+Write a polite email asking my manager for a day off.
+What is the best way to learn a new language as an adult?
+Summarize the plot of Romeo and Juliet in three sentences.
+How do I keep basil plants alive indoors?
+Explain what a mortgage is and how interest works on it.
+Give me ideas for a rainy-day activity with kids.
+How do I remove a coffee stain from a white shirt?
+Write a haiku about autumn leaves.
+What should I pack for a weekend camping trip?
+How does a refrigerator keep food cold?
+Recommend some classic novels for a beginner reader.
+How do I write a good cover letter for a teaching job?
+Explain the rules of chess to a beginner.
+What are healthy snacks I can bring to work?
+How do I sort a list of numbers in Python?
+Describe how the water cycle works.
+Give me tips for a job interview over video call.
+How long should I boil an egg for a soft yolk?
+Write a thank-you note to a friend who helped me move.
+What is the capital of Australia and what is it known for?
+How can I make my small apartment feel bigger?
+Explain how vaccines help the immune system.
+Suggest a weekly workout plan for a beginner.
+How do I start a vegetable garden on a balcony?
+What are the main causes of the French Revolution?
+Help me write a toast for my sister's wedding.
+How do I clean a cast iron pan?
+Explain what machine learning is to a ten-year-old.
+What are some tips for saving money on groceries?
+How do solar panels generate electricity?
+Write a short story about a dog who learns to surf.
+How can I be more productive when working from home?
+What is the difference between weather and climate?
+Give me a checklist for preparing my car for winter.
+How do I teach my child to ride a bike?
+Explain the basics of how the stock market works.
+Recommend some board games for a family night.
+How do I make homemade pizza dough?
+What are good habits for maintaining healthy teeth?
+Write a product description for a handmade wooden bowl.
+How do I calculate the area of a circle?
+What are some ways to reduce stress before an exam?
+Explain how airplanes stay in the air.
+Suggest a playlist theme for a road trip.
+How do I set up a new Wi-Fi router at home?
+What are the health benefits of drinking water?
+Help me write a short bio for my LinkedIn profile.
+How do I care for a new puppy in its first week?
+Explain the difference between renewable and non-renewable energy.
+What are fun facts about the moon?

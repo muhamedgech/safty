@@ -1,0 +1,32 @@
+# PACT project configuration.
+# Every script reads this file, so all paths, sizes and seeds live in one place.
+
+seed: 0
+
+paths:
+  raw_dir: data/raw              # untouched downloads (cached, never edited)
+  processed_dir: data/processed  # our cleaned datasets, one JSONL file per source
+
+# Step 1: the prompt sources we build datasets from.
+sources:
+  advbench:
+    url: https://raw.githubusercontent.com/llm-attacks/llm-attacks/main/data/advbench/harmful_behaviors.csv
+    expected_count: 520
+    translate_first_n: 200       # the first 200 prompts get translated (paper: 200 shared ids)
+
+  maliciousinstruct:
+    url: https://raw.githubusercontent.com/Princeton-SysML/Jailbreak_LLM/main/data/MaliciousInstruct.txt
+    expected_count: 100
+
+  xstest:
+    url: https://raw.githubusercontent.com/paul-rottger/exaggerated-safety/main/xstest_prompts.csv
+    expected_count: 450          # 250 safe + 200 unsafe
+
+  orbench_hard:
+    hf_repo: bench-llm/or-bench
+    hf_file: or-bench-hard-1k.csv
+    sample_n: 150                # stratified by category
+
+  benign:
+    path: resources/benign_prompts.txt
+    expected_count: 60

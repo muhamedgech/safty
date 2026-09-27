@@ -1,0 +1,6 @@
+# Data is rebuilt by the scripts; manifest.json hashes prove two builds are identical.
+data/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
